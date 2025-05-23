@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>萬萬音樂展示</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- AOS Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: #181c1f;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .bg-img {
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            object-fit: cover;
+            z-index: 0;
+            filter: brightness(0.7) blur(0.5px);
+        }
+        .bg-mask {
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.45);
+            z-index: 1;
+        }
+        .main-content {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 80px 0 60px 7vw;
+        }
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            margin-bottom: 18px;
+            color: #fff;
+            text-shadow: 0 4px 32px #000a, 0 1px 0 #2228;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            color: #e0e0e0;
+            margin-bottom: 48px;
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 12px #0006;
+        }
+        .music-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+        }
+        .song-group {
+            background: rgba(20,20,24,0.72);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+            padding: 36px 32px 28px 32px;
+            margin-bottom: 0;
+            transition: box-shadow 0.3s, transform 0.3s;
+            position: relative;
+        }
+        .song-group:hover {
+            box-shadow: 0 16px 48px 0 rgba(0,0,0,0.28);
+            transform: translateY(-4px) scale(1.01);
+        }
+        .song-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+            color: #fff;
+            letter-spacing: 0.06em;
+            text-shadow: 0 2px 8px #000a;
+        }
+        .song-versions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin-bottom: 22px;
+        }
+        .song-version {
+            flex: 1 1 260px;
+            min-width: 220px;
+            background: rgba(40,40,48,0.85);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+            padding: 18px 14px 12px 14px;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: box-shadow 0.2s, transform 0.2s;
+            border: 1px solid #222a;
+        }
+        .song-version h3 {
+            color: #fff;
+            font-size: 1.13rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-shadow: 0 1px 4px #0008;
+        }
+        audio {
+            width: 100%;
+            margin-bottom: 6px;
+        }
+        .lyrics {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px 16px;
+            font-size: 1.09rem;
+            line-height: 1.85;
+            color: #f3f3f3;
+            box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
+            white-space: pre-wrap;
+            margin-top: 12px;
+            min-height: 60px;
+            transition: background 0.3s;
+            border: 1px solid #222a;
+            text-shadow: 0 1px 4px #0008;
+        }
+        .lyrics:empty {
+            background: none;
+            min-height: 0;
+        }
+        @media (max-width: 700px) {
+            .main-content {
+                padding: 32px 0 24px 0;
+                width: 100vw;
+                min-width: 0;
+            }
+            .main-title { font-size: 1.5rem; margin-left: 18px; }
+            .subtitle { font-size: 1rem; margin-left: 18px; }
+            .music-container {
+                padding: 0 10px;
+                gap: 28px;
+            }
+            .song-group {
+                padding: 18px 10px 12px 10px;
+                border-radius: 18px;
+                margin-bottom: 0;
+            }
+            .song-title { font-size: 1.1rem; margin-bottom: 12px; }
+            .song-versions { gap: 8px; }
+            .song-version {
+                min-width: 0;
+                border-radius: 12px;
+                padding: 10px 6px 8px 6px;
+            }
+            .lyrics {
+                padding: 12px 6px;
+                border-radius: 10px;
+                font-size: 0.98rem;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img class="bg-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80" alt="bg" />
+    <div class="bg-mask"></div>
+    <div class="main-content">
+        <div class="main-title" data-aos="fade-down">萬萬音樂展示</div>
+        <div class="subtitle" data-aos="fade-up" data-aos-delay="200">2025流行深色大圖風格・動態・極簡美學</div>
+        <div class="music-container" id="music-container"></div>
+    </div>
+    <!-- AOS Animate On Scroll -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 900, once: true });
+    </script>
+    <script>
+        const musicFiles = {
+            '萬萬戀習曲': {
+                songs: [
+                    '萬萬戀習曲 (1).mp3',
+                    '萬萬戀習曲 (2).mp3',
+                    '萬萬戀習曲 (3).mp3',
+                    '萬萬戀習曲 (1)(1).mp3'
+                ],
+                lyrics: '萬萬戀習曲.json'
+            },
+            '奶席登場': {
+                songs: [
+                    '奶席登場.mp3',
+                    '奶席登場 (1).mp3'
+                ],
+                lyrics: '奶昔登場.json'
+            },
+            '你喝下了整個下午': {
+                songs: [
+                    '你喝下了整個下午萬萬版本.mp3',
+                    '你喝下了整個下午萬萬版本 (1).mp3'
+                ],
+                lyrics: '你喝下了整個下午（萬萬版本）.json'
+            },
+            '你笑起來像夏天': {
+                songs: [
+                    '你笑起來像夏天萬萬版本.mp3',
+                    '你笑起來像夏天萬萬版本 (1).mp3',
+                    '你笑起來像夏天YouSmileLikeSummer.mp3'
+                ],
+                lyrics: '你笑起來像夏天（萬萬版本.json'
+            },
+            '溶在你夏天的flow': {
+                songs: [
+                    '溶在你夏天的flowMeltedinYourSummerFlow.mp3'
+                ],
+                lyrics: '溶在你夏天的flow.json'
+            },
+            '萬萬的奇幻日常': {
+                songs: [
+                    '萬萬的奇幻日常.mp3',
+                    '萬萬的奇幻日常 (1).mp3'
+                ],
+                lyrics: '萬萬的奇幻日常.json'
+            }
+        };
+
+        async function loadLyrics(filename) {
+            try {
+                const response = await fetch(`/lyrics/${filename}`);
+                const data = await response.json();
+                if (data.error) {
+                    console.error('Error loading lyrics:', data.error);
+                    return `無法加載歌詞: ${data.error}`;
+                }
+                return data.text || '無歌詞內容';
+            } catch (error) {
+                console.error('Error loading lyrics:', error);
+                return '無法加載歌詞';
+            }
+        }
+
+        async function createSongGroup(title, songs, lyricsFile, idx) {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'song-group';
+            groupDiv.setAttribute('data-aos', 'fade-up');
+            groupDiv.setAttribute('data-aos-delay', 100 + idx * 100);
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'song-title';
+            titleDiv.textContent = title;
+            groupDiv.appendChild(titleDiv);
+
+            const versionsDiv = document.createElement('div');
+            versionsDiv.className = 'song-versions';
+            
+            for (const song of songs) {
+                const versionDiv = document.createElement('div');
+                versionDiv.className = 'song-version';
+                
+                const versionTitle = document.createElement('h3');
+                versionTitle.textContent = song;
+                versionDiv.appendChild(versionTitle);
+
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = `/audio/${song}`;
+                versionDiv.appendChild(audio);
+                
+                versionsDiv.appendChild(versionDiv);
+            }
+            
+            groupDiv.appendChild(versionsDiv);
+
+            const lyricsDiv = document.createElement('div');
+            lyricsDiv.className = 'lyrics';
+            lyricsDiv.textContent = '載入歌詞中...';
+            groupDiv.appendChild(lyricsDiv);
+
+            const lyrics = await loadLyrics(lyricsFile);
+            lyricsDiv.textContent = (lyrics || '')
+              .split('\n')
+              .map(line => line.replace(/^[\s\u3000\uFEFF]+/, ''))
+              .join('\n')
+              .replace(/^\s*\n+/, '');
+
+            return groupDiv;
+        }
+
+        async function initializeMusicPlayer() {
+            const container = document.getElementById('music-container');
+            let idx = 0;
+            for (const [title, data] of Object.entries(musicFiles)) {
+                const group = await createSongGroup(title, data.songs, data.lyrics, idx);
+                container.appendChild(group);
+                idx++;
+            }
+        }
+
+        initializeMusicPlayer();
+    </script>
+</body>
+</html> 
